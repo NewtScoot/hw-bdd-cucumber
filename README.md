@@ -1,3 +1,87 @@
+nmccollum:~/workspace/hw-bdd-cucumber/rottenpotatoes (master) $ cucumber
+DEPRECATION WARNING: The configuration option `config.serve_static_assets` has been renamed to `config.serve_static_files` to clarify its role (it merely enables serving everything in the `public` folder and is unrelated to the asset pipeline). The `serve_static_assets` alias will be removed in Rails 5.0. Please migrate your configuration files accordingly. (called from block in <top (required)> at /home/ubuntu/workspace/hw-bdd-cucumber/rottenpotatoes/config/environments/test.rb:11)
+Using the default profile...
+Feature: display list of movies filtered by MPAA rating
+  As a concerned parent
+  So that I can quickly browse movies appropriate for my family
+  I want to see movies matching only certain MPAA ratings
+
+  Background: movies have been added to database # features/filter_movie_list.feature:7
+    Given the following movies exist:            # features/step_definitions/movie_steps.rb:3
+      | title                   | rating | release_date |
+      | Aladdin                 | G      | 25-Nov-1992  |
+      | The Terminator          | R      | 26-Oct-1984  |
+      | When Harry Met Sally    | R      | 21-Jul-1989  |
+      | The Help                | PG-13  | 10-Aug-2011  |
+      | Chocolat                | PG-13  | 5-Jan-2001   |
+      | Amelie                  | R      | 25-Apr-2001  |
+      | 2001: A Space Odyssey   | G      | 6-Apr-1968   |
+      | The Incredibles         | PG     | 5-Nov-2004   |
+      | Raiders of the Lost Ark | PG     | 12-Jun-1981  |
+      | Chicken Run             | G      | 21-Jun-2000  |
+    And I am on the RottenPotatoes home page     # features/step_definitions/web_steps.rb:44
+
+  Scenario: restrict to movies with 'PG' or 'R' ratings # features/filter_movie_list.feature:24
+      # enter step(s) to check the 'PG' and 'R' checkboxes
+    Given I check the following ratings: PG R           # features/step_definitions/movie_steps.rb:26
+      # enter step(s) to uncheck all other checkboxes
+    And I uncheck the following ratings: G PG-13 NC-17  # features/step_definitions/movie_steps.rb:26
+      # enter step to "submit" the search form on the homepage
+    And I press "Refresh"                               # features/step_definitions/web_steps.rb:52
+DEPRECATION: Using `should` from rspec-expectations' old `:should` syntax without explicitly enabling the syntax is deprecated. Use the new `:expect` syntax or explicitly enable `:should` with `config.expect_with(:rspec) { |c| c.syntax = :should }` instead. Called from /home/ubuntu/workspace/hw-bdd-cucumber/rottenpotatoes/features/step_definitions/web_steps.rb:109:in `block in <top (required)>'.
+      # enter step(s) to ensure that PG and R movies are visible
+    Then I should see "Raiders of the Lost Ark"         # features/step_definitions/web_steps.rb:107
+    And I should see "When Harry Met Sally"             # features/step_definitions/web_steps.rb:107
+    And I should see "The Incredibles"                  # features/step_definitions/web_steps.rb:107
+      # enter step(s) to ensure that other movies are not visible
+    And I should not see "Aladdin"                      # features/step_definitions/web_steps.rb:125
+
+  Scenario: all ratings selected                            # features/filter_movie_list.feature:38
+      #check all the movies
+    Given I check the following ratings: G PG PG-13 NC-17 R # features/step_definitions/movie_steps.rb:26
+      #select submit
+    And I press "Refresh"                                   # features/step_definitions/web_steps.rb:52
+      #see all the movies
+    Then I should see all the movies                        # features/step_definitions/movie_steps.rb:40
+
+Feature: display list of movies sorted by different criteria
+  As an avid moviegoer
+  So that I can quickly browse movies based on my preferences
+  I want to see movies sorted by title or release date
+
+  Background: movies have been added to database # features/sort_movie_list.feature:7
+    Given the following movies exist:            # features/step_definitions/movie_steps.rb:3
+      | title                   | rating | release_date |
+      | Aladdin                 | G      | 25-Nov-1992  |
+      | The Terminator          | R      | 26-Oct-1984  |
+      | When Harry Met Sally    | R      | 21-Jul-1989  |
+      | The Help                | PG-13  | 10-Aug-2011  |
+      | Chocolat                | PG-13  | 5-Jan-2001   |
+      | Amelie                  | R      | 25-Apr-2001  |
+      | 2001: A Space Odyssey   | G      | 6-Apr-1968   |
+      | The Incredibles         | PG     | 5-Nov-2004   |
+      | Raiders of the Lost Ark | PG     | 12-Jun-1981  |
+      | Chicken Run             | G      | 21-Jun-2000  |
+    And I am on the RottenPotatoes home page     # features/step_definitions/web_steps.rb:44
+
+  Scenario: sort movies alphabetically                      # features/sort_movie_list.feature:24
+    Given I check the following ratings: G PG PG-13 NC-17 R # features/step_definitions/movie_steps.rb:26
+    And I press "Refresh"                                   # features/step_definitions/web_steps.rb:52
+    When I follow "Movie Title"                             # features/step_definitions/web_steps.rb:56
+    Then I should see "Aladdin" before "Amelie"             # features/step_definitions/movie_steps.rb:15
+    Then I should see "Chicken Run" before "Chocolat"       # features/step_definitions/movie_steps.rb:15
+
+  Scenario: sort movies in increasing order of release date          # features/sort_movie_list.feature:31
+    When I follow "Release Date"                                     # features/step_definitions/web_steps.rb:56
+    Then I should see "Raiders of the Lost Ark" before "Chicken Run" # features/step_definitions/movie_steps.rb:15
+    Then I should see "Amelie" before "The Incredibles"              # features/step_definitions/movie_steps.rb:15
+
+4 scenarios (4 passed)
+26 steps (26 passed)
+0m0.644s
+nmccollum:~/workspace/hw-bdd-cucumber/rottenpotatoes (master) $
+
+
 BDD and Cucumber
 ================
 
